@@ -22,6 +22,35 @@ namespace IdentityEx.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("IdentityEx.Models.Category", b =>
+                {
+                    b.Property<long>("CategoryID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("CategoryID"));
+
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CategoryID");
+
+                    b.ToTable("Category");
+
+                    b.HasData(
+                        new
+                        {
+                            CategoryID = 1L,
+                            CategoryName = "Computer"
+                        },
+                        new
+                        {
+                            CategoryID = 2L,
+                            CategoryName = "Home Appliances"
+                        });
+                });
+
             modelBuilder.Entity("IdentityEx.Models.Product", b =>
                 {
                     b.Property<long>("ProductID")
@@ -29,6 +58,9 @@ namespace IdentityEx.Migrations
                         .HasColumnType("bigint");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ProductID"));
+
+                    b.Property<long>("CategoryID")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("MfgName")
                         .IsRequired()
@@ -43,12 +75,15 @@ namespace IdentityEx.Migrations
 
                     b.HasKey("ProductID");
 
+                    b.HasIndex("CategoryID");
+
                     b.ToTable("Products");
 
                     b.HasData(
                         new
                         {
                             ProductID = 121L,
+                            CategoryID = 1L,
                             MfgName = "Intex",
                             Price = 450m,
                             ProductName = "Mouse"
@@ -56,6 +91,7 @@ namespace IdentityEx.Migrations
                         new
                         {
                             ProductID = 122L,
+                            CategoryID = 1L,
                             MfgName = "Logitech",
                             Price = 1450m,
                             ProductName = "Keyboard"
@@ -63,9 +99,10 @@ namespace IdentityEx.Migrations
                         new
                         {
                             ProductID = 123L,
+                            CategoryID = 2L,
                             MfgName = "LG",
                             Price = 2200m,
-                            ProductName = "Monitor"
+                            ProductName = "Washing Machine"
                         });
                 });
 
@@ -283,6 +320,17 @@ namespace IdentityEx.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("IdentityEx.Models.Product", b =>
+                {
+                    b.HasOne("IdentityEx.Models.Category", "Category")
+                        .WithMany("Products")
+                        .HasForeignKey("CategoryID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -332,6 +380,11 @@ namespace IdentityEx.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("IdentityEx.Models.Category", b =>
+                {
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

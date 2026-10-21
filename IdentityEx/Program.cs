@@ -1,3 +1,5 @@
+using AutoMapper;
+using IdentityEx.AutMapperConfig;
 using IdentityEx.Models;
 using IdentityEx.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -11,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<CompanyContext>();
 builder.Services.AddControllers();
-builder.Services.AddDbContextPool<CompanyContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("scon")));
+builder.Services.AddDbContextPool<CompanyContext>(opt => opt.UseLazyLoadingProxies().UseSqlServer(builder.Configuration.GetConnectionString("scon")));
 
 var issuer = builder.Configuration["JWT:issuer"];
 var audience = builder.Configuration["JWT:audience"];
@@ -42,6 +44,8 @@ JwtBearerDefaults.AuthenticationScheme;
 
 });
 builder.Services.AddScoped<IToken, TokenService>();
+
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => {

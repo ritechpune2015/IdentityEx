@@ -1,4 +1,5 @@
-﻿using IdentityEx.Dtos;
+﻿using AutoMapper;
+using IdentityEx.Dtos;
 using IdentityEx.Models;
 using IdentityEx.Services;
 using Microsoft.AspNetCore.Http;
@@ -14,11 +15,13 @@ namespace IdentityEx.Controllers
         UserManager<User> _usermanager;
         SignInManager<User> _signinmanager; 
         IToken _tokensvr;
-        public ManageUsersController(UserManager<User> usermanager,IToken tokensvr,SignInManager<User> signin)
+        IMapper _map;
+        public ManageUsersController(UserManager<User> usermanager,IToken tokensvr,SignInManager<User> signin,IMapper map)
             {
             this._usermanager = usermanager;
             this._tokensvr = tokensvr;
             this._signinmanager = signin;
+            this._map = map;
             }
 
         [HttpGet]
@@ -63,14 +66,20 @@ namespace IdentityEx.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserDto rec)
         {
-            var urec = new User() {
-                 FirstName=rec.FirstName,
-                  LastName=rec.LastName,
-                  Address=rec.Address,
-                  Email=rec.EmailID,
-                  MobileNo=rec.MobileNo,    
-                  UserName =rec.EmailID
-            };
+            ////manuallly 
+            //var urec = new User() {
+            //     FirstName=rec.FirstName,
+            //      LastName=rec.LastName,
+            //      Address=rec.Address,
+            //      Email=rec.EmailID,
+            //      MobileNo=rec.MobileNo,    
+            //      UserName =rec.EmailID
+            //};
+
+
+            var urec=this._map.Map<User>(rec);
+           // urec.UserName = rec.Email;
+
             var res=await this._usermanager.CreateAsync(urec, rec.Password);
             if (res.Succeeded)
             {
